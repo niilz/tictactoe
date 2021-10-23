@@ -6,6 +6,12 @@ pub enum Player {
     TWO,
 }
 
+impl Default for Player {
+    fn default() -> Self {
+        Player::ONE
+    }
+}
+
 impl fmt::Display for Player {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
