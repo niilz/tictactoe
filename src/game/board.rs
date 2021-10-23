@@ -34,6 +34,19 @@ impl Board {
             }
         }
     }
+
+    fn get_diags(
+        &self,
+    ) -> (
+        impl Iterator<Item = Option<Player>> + '_,
+        impl Iterator<Item = Option<Player>> + '_,
+    ) {
+        let tl_br = self.iter().enumerate().map(|(idx, row)| row[idx]);
+        let bl_tr = self.iter().rev().enumerate().map(|(idx, row)| row[idx]);
+        (tl_br, bl_tr)
+    }
+
+    // TODO: get_rows, get_cols, check_winner
 }
 
 fn gen_line(values: &[Option<Player>; 3]) -> String {
@@ -143,5 +156,25 @@ mod tests {
     fn can_get_width() {
         let board = Board::default();
         assert_eq!(3, board.get_width());
+    }
+
+    #[test]
+    fn can_get_diagonals() {
+        let mut board = Board::default();
+        let _ = board.set_value(Player::ONE, (0, 0));
+        let _ = board.set_value(Player::ONE, (1, 1));
+        let _ = board.set_value(Player::ONE, (2, 2));
+
+        let expected_tl_br = vec![Some(Player::ONE), Some(Player::ONE), Some(Player::ONE)];
+        let (tl_br, _) = board.get_diags();
+        assert_eq!(expected_tl_br, tl_br.collect::<Vec<_>>());
+
+        let _ = board.set_value(Player::TWO, (0, 2));
+        let _ = board.set_value(Player::TWO, (1, 1));
+        let _ = board.set_value(Player::TWO, (2, 0));
+
+        let expected_bl_tr = vec![Some(Player::TWO), Some(Player::TWO), Some(Player::TWO)];
+        let (_, bl_tr) = board.get_diags();
+        assert_eq!(expected_bl_tr, bl_tr.collect::<Vec<_>>());
     }
 }
