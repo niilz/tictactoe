@@ -38,23 +38,60 @@ impl Board {
     fn get_diags(
         &self,
     ) -> (
-        impl Iterator<Item = Option<Player>> + '_,
-        impl Iterator<Item = Option<Player>> + '_,
+        impl Iterator<Item = Option<Player>> + Clone + '_,
+        impl Iterator<Item = Option<Player>> + Clone + '_,
     ) {
         let tl_br = self.iter().enumerate().map(|(idx, row)| row[idx]);
         let bl_tr = self.iter().rev().enumerate().map(|(idx, row)| row[idx]);
         (tl_br, bl_tr)
     }
 
-    fn get_rows(&self) -> impl Iterator<Item = impl Iterator<Item = Option<Player>> + '_> + '_ {
+    fn get_rows(
+        &self,
+    ) -> impl Iterator<Item = impl Iterator<Item = Option<Player>> + Clone + '_> + Clone + '_ {
         self.iter().map(|row| row.iter().map(|&item| item))
     }
 
-    fn get_cols(&self) -> impl Iterator<Item = impl Iterator<Item = Option<Player>> + '_> + '_ {
+    fn get_cols(
+        &self,
+    ) -> impl Iterator<Item = impl Iterator<Item = Option<Player>> + Clone + '_> + Clone + '_ {
         (0..3).map(move |row| (0..3).map(move |col| self.values[col][row]))
     }
 
-    // TODO: get_cols, check_winner
+    fn get_winner(&self) -> Option<Player> {
+        let diags = self.get_diags();
+        if let Some(winner) = check_for_winner(diags.0) {
+            return Some(winner);
+        }
+        if let Some(winner) = check_for_winner(diags.1) {
+            return Some(winner);
+        }
+        for row in self.get_rows() {
+            if let Some(winner) = check_for_winner(row) {
+                return Some(winner);
+            }
+        }
+        for col in self.get_cols() {
+            if let Some(winner) = check_for_winner(col) {
+                return Some(winner);
+            }
+        }
+        None
+    }
+}
+
+fn check_for_winner(mut cells: impl Iterator<Item = Option<Player>> + Clone) -> Option<Player> {
+    let are_all_one = cells.clone().all(|p| p == Some(Player::ONE));
+
+    println!("len after: {:?}", cells.size_hint());
+    let are_all_two = cells.all(|p| p == Some(Player::TWO));
+
+    println!("ones: {}, twos: {}", are_all_one, are_all_two);
+    match (are_all_one, are_all_two) {
+        (true, _) => Some(Player::ONE),
+        (_, true) => Some(Player::TWO),
+        (false, false) => None,
+    }
 }
 
 fn gen_line(values: &[Option<Player>; 3]) -> String {
@@ -244,5 +281,87 @@ mod tests {
             .map(|col| col.collect::<Vec<_>>())
             .collect::<Vec<_>>();
         assert_eq!(expected_cols, cols);
+    }
+
+    #[test]
+    fn check_for_winner_finds_winner() {
+        let mut board = Board::default();
+        // diag_tl_br (ONE is Winner)
+        let _ = board.set_value(Player::ONE, (0, 0));
+        let _ = board.set_value(Player::ONE, (1, 1));
+        let _ = board.set_value(Player::ONE, (2, 2));
+
+        let winner = check_for_winner(board.get_diags().0);
+        assert_eq!(Some(Player::ONE), winner);
+
+        // diag_bl_tr (TWO is Winner)
+        let _ = board.set_value(Player::TWO, (0, 2));
+        let _ = board.set_value(Player::TWO, (1, 1));
+        let _ = board.set_value(Player::TWO, (2, 0));
+
+        let winner = check_for_winner(board.get_diags().1);
+        assert_eq!(Some(Player::TWO), winner);
+
+        // Nobody is winner anymore
+        let _ = board.set_value(Player::ONE, (0, 2));
+        let _ = board.set_value(Player::TWO, (0, 0));
+
+        let no_winner = check_for_winner(board.get_diags().0);
+        assert_eq!(None, no_winner);
+
+        let no_winner = check_for_winner(board.get_diags().1);
+        let _ = board.set_value(Player::ONE, (1, 2));
+        assert_eq!(None, no_winner);
+    }
+
+    #[test]
+    fn line_that_contains_none_is_not_a_winner() {
+        let line = vec![Some(Player::ONE), Some(Player::ONE), None];
+        let no_winner = check_for_winner(line.into_iter());
+        assert_eq!(None, no_winner);
+    }
+
+    #[test]
+    fn winner_in_cols_gets_detected() {
+        let mut board = Board::default();
+        // col-0
+        let _ = board.set_value(Player::ONE, (0, 0));
+        let _ = board.set_value(Player::ONE, (1, 0));
+        let _ = board.set_value(Player::ONE, (2, 0));
+
+        // col-1
+        let _ = board.set_value(Player::TWO, (0, 1));
+        let _ = board.set_value(Player::TWO, (1, 1));
+        let _ = board.set_value(Player::TWO, (2, 1));
+
+        // col-2
+        let _ = board.set_value(Player::ONE, (0, 2));
+        let _ = board.set_value(Player::ONE, (1, 2));
+
+        let mut columns = board.get_cols();
+
+        let winner = check_for_winner(columns.next().unwrap());
+        assert_eq!(Some(Player::ONE), winner);
+
+        let winner = check_for_winner(columns.next().unwrap());
+        assert_eq!(Some(Player::TWO), winner);
+
+        let no_winner = check_for_winner(columns.next().unwrap());
+        assert_eq!(None, no_winner);
+    }
+
+    #[test]
+    fn winner_in_col_is_detected() {
+        assert!(false)
+    }
+
+    #[test]
+    fn get_winner_returns_none_if_draw() {
+        assert!(false)
+    }
+
+    #[test]
+    fn get_winner_returns_winner_if_there_is_one() {
+        assert!(false)
     }
 }
