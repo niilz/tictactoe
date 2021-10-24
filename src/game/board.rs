@@ -111,7 +111,9 @@ impl Board {
         let width = self.get_width() - 1;
         let (x, y) = field;
         if x > height || y > width {
-            Err("field must be in range of the grid")
+            Err("Field must be in range of the grid")
+        } else if self.values[x][y].is_some() {
+            Err("Field has already been chosen. Please choose another field.")
         } else {
             self.values[x][y] = Some(player);
             Ok(())
@@ -182,9 +184,20 @@ mod tests {
     fn setting_fields_outside_the_grid_is_an_error() {
         let mut board = Board::default();
         let err = board.set_value(Player::ONE, (0, 3));
-        assert_eq!(Err("field must be in range of the grid"), err);
+        assert_eq!(Err("Field must be in range of the grid"), err);
         let err = board.set_value(Player::ONE, (3, 0));
-        assert_eq!(Err("field must be in range of the grid"), err);
+        assert_eq!(Err("Field must be in range of the grid"), err);
+    }
+
+    #[test]
+    fn setting_field_thats_already_set_is_an_error() {
+        let mut board = Board::default();
+        let _ = board.set_value(Player::ONE, (0, 0));
+        let err = board.set_value(Player::ONE, (0, 0));
+        assert_eq!(
+            Err("Field has already been chosen. Please choose another field."),
+            err
+        );
     }
 
     #[test]
@@ -210,6 +223,7 @@ mod tests {
         let (tl_br, _) = board.get_diags();
         assert_eq!(expected_tl_br, tl_br.collect::<Vec<_>>());
 
+        let mut board = Board::default();
         let _ = board.set_value(Player::TWO, (0, 2));
         let _ = board.set_value(Player::TWO, (1, 1));
         let _ = board.set_value(Player::TWO, (2, 0));
@@ -291,6 +305,7 @@ mod tests {
         assert_eq!(Some(Player::ONE), winner);
 
         // diag_bl_tr (TWO is Winner)
+        let mut board = Board::default();
         let _ = board.set_value(Player::TWO, (0, 2));
         let _ = board.set_value(Player::TWO, (1, 1));
         let _ = board.set_value(Player::TWO, (2, 0));
@@ -299,6 +314,7 @@ mod tests {
         assert_eq!(Some(Player::TWO), winner);
 
         // Nobody is winner anymore
+        let mut board = Board::default();
         let _ = board.set_value(Player::ONE, (0, 2));
         let _ = board.set_value(Player::TWO, (0, 0));
 
