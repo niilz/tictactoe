@@ -78,16 +78,16 @@ impl Game {
                 }
                 val => match val.parse::<u32>() {
                     Ok(value) if self.row.is_none() => {
-                        self.row = Some(value as usize);
+                        self.row = Some((value - 1) as usize);
                         continue;
                     }
                     Ok(value) => {
-                        self.col = Some(value as usize);
+                        self.col = Some((value - 1) as usize);
                         continue;
                     }
                     Err(e) => {
                         println!(
-                            "Please enter a valid number. The range is: 0 - {}, Err: {}",
+                            "Please enter a valid number. The range is: 1 - {}, Err: {}",
                             self.board.get_height(),
                             e
                         );
