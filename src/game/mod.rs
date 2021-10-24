@@ -49,14 +49,12 @@ impl Game {
                 BoardState::ONGOING => { /* just keep going */ }
             }
 
-            println!();
-            println!("It is player {:?}'s' turn", self.player);
-            println!();
-
-            self.board.draw();
-
             match (self.row, self.col) {
                 (None, None) => {
+                    println!();
+                    println!("It is player {:?}'s' turn", self.player);
+                    println!();
+                    self.board.draw();
                     println!();
                     println!("Please enter a row number");
                     println!();
