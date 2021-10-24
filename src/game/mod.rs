@@ -35,8 +35,8 @@ impl Game {
 
         loop {
             if let Some(winner) = self.board.get_winner() {
-                println!("Congratulations! Player {:?} won!", winner);
                 println!();
+                println!("Congratulations! Player {:?} won!", winner);
                 self.board.draw();
                 println!();
                 break;

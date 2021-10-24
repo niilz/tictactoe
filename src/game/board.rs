@@ -25,10 +25,12 @@ impl DerefMut for Board {
 
 impl Board {
     pub fn draw(&self) {
-        let print_sep = || println!("---+---+---");
+        let print_sep = || println!("      ---+---+---");
 
+        println!("      col col col");
+        println!("       1   2   3");
         for (line_num, line) in self.values.iter().enumerate() {
-            println!("{}", gen_line(&line));
+            println!("row {} {}", line_num + 1, gen_line(&line));
             if should_print_seperator(line_num, self.values.len()) {
                 print_sep();
             }
