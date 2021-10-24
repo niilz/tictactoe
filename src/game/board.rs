@@ -46,6 +46,10 @@ impl Board {
         (tl_br, bl_tr)
     }
 
+    fn get_rows(&self) -> impl Iterator<Item = impl Iterator<Item = Option<Player>> + '_> + '_ {
+        self.iter().map(|row| row.iter().map(|&item| item))
+    }
+
     // TODO: get_rows, get_cols, check_winner
 }
 
@@ -176,5 +180,20 @@ mod tests {
         let expected_bl_tr = vec![Some(Player::TWO), Some(Player::TWO), Some(Player::TWO)];
         let (_, bl_tr) = board.get_diags();
         assert_eq!(expected_bl_tr, bl_tr.collect::<Vec<_>>());
+    }
+
+    #[test]
+    fn can_get_rows() {
+        let mut board = Board::default();
+        for i in 0..3 {
+            for j in 0..3 {
+                let _ = board.set_value(Player::ONE, (i, j));
+            }
+        }
+        let expected_rows: Vec<_> = (0..3)
+            .flat_map(|_| (0..3).map(|_| Some(Player::ONE)))
+            .collect();
+        let rows: Vec<_> = board.get_rows().flatten().collect();
+        assert_eq!(expected_rows, rows);
     }
 }
