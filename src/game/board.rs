@@ -81,16 +81,12 @@ impl Board {
 }
 
 fn check_for_winner(mut cells: impl Iterator<Item = Option<Player>> + Clone) -> Option<Player> {
-    let are_all_one = cells.clone().all(|p| p == Some(Player::ONE));
-
-    println!("len after: {:?}", cells.size_hint());
-    let are_all_two = cells.all(|p| p == Some(Player::TWO));
-
-    println!("ones: {}, twos: {}", are_all_one, are_all_two);
-    match (are_all_one, are_all_two) {
-        (true, _) => Some(Player::ONE),
-        (_, true) => Some(Player::TWO),
-        (false, false) => None,
+    if cells.clone().all(|p| p == Some(Player::ONE)) {
+        Some(Player::ONE)
+    } else if cells.all(|p| p == Some(Player::TWO)) {
+        Some(Player::TWO)
+    } else {
+        None
     }
 }
 
