@@ -15,8 +15,8 @@ impl Default for Player {
 impl fmt::Display for Player {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::ONE => write!(f, "X"),
-            Self::TWO => write!(f, "O"),
+            Self::ONE => write!(f, "🧠"),
+            Self::TWO => write!(f, "🍺"),
         }
     }
 }
@@ -30,6 +30,6 @@ mod tests {
     fn can_represent_players() {
         let one = format!("{}", Player::ONE);
         let two = format!("{}", Player::TWO);
-        assert_eq!(("X".to_string(), "O".to_string()), (one, two));
+        assert_eq!(("🧠".to_string(), "🍺".to_string()), (one, two));
     }
 }

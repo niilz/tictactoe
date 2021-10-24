@@ -32,10 +32,10 @@ impl DerefMut for Board {
 
 impl Board {
     pub fn draw(&self) {
-        let print_sep = || println!("      ---+---+---");
+        let print_sep = || println!("      ----+----+----");
 
-        println!("      col col col");
-        println!("       1   2   3");
+        println!("      col  col  col");
+        println!("       1    2    3");
         for (line_num, line) in self.values.iter().enumerate() {
             println!("row {} {}", line_num + 1, gen_line(&line));
             if should_print_seperator(line_num, self.values.len()) {
@@ -114,7 +114,7 @@ fn gen_line(values: &[Option<Player>; 3]) -> String {
         .iter()
         .map(|p| match p {
             Some(p) => format!(" {} ", p),
-            None => "   ".to_string(),
+            None => "    ".to_string(),
         })
         .collect::<Vec<String>>()
         .join("|")
@@ -174,14 +174,14 @@ mod tests {
 
     #[test]
     fn empty_line_gets_created() {
-        let expected_line = "   |   |   ";
+        let expected_line = "    |    |    ";
         let line = gen_line(&[None; 3]);
         assert_eq!(expected_line, line);
     }
 
     #[test]
     fn line_with_both_players_gets_created() {
-        let expected_line = " X |   | O ";
+        let expected_line = " 🧠 |    | 🍺 ";
         let line = gen_line(&[Some(Player::ONE), None, Some(Player::TWO)]);
         assert_eq!(expected_line, line);
     }
