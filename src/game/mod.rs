@@ -49,6 +49,7 @@ impl Game {
                 BoardState::ONGOING => { /* just keep going */ }
             }
 
+            println!();
             println!("It is player {:?}'s' turn", self.player);
             println!();
 
@@ -56,10 +57,12 @@ impl Game {
 
             match (self.row, self.col) {
                 (None, None) => {
+                    println!();
                     println!("Please enter a row number");
                     println!();
                 }
                 (Some(_), None) => {
+                    println!();
                     println!("Please enter a column number");
                     println!();
                 }
@@ -70,6 +73,7 @@ impl Game {
                         continue;
                     }
                     Err(e) => {
+                        println!();
                         println!("{}", e);
                         self.reset_row_col();
                     }
@@ -84,19 +88,24 @@ impl Game {
                     break;
                 }
                 val => match val.parse::<u32>() {
-                    Ok(value) if self.row.is_none() => {
+                    Ok(value) if self.row.is_none() && value > 0 => {
                         self.row = Some((value - 1) as usize);
                         continue;
                     }
-                    Ok(value) => {
+                    Ok(value) if value > 0 => {
                         self.col = Some((value - 1) as usize);
                         continue;
                     }
-                    Err(e) => {
+                    Ok(_) => {
                         println!(
-                            "Please enter a valid number. The range is: 1 - {}, Err: {}",
+                            "Please enter a valid number. The range is: 1 - {}",
                             self.board.get_height(),
-                            e
+                        );
+                    }
+                    Err(_) => {
+                        println!(
+                            "Please enter a digit between 1 and {}",
+                            self.board.get_height(),
                         );
                         continue;
                     }
