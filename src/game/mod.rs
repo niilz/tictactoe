@@ -34,6 +34,14 @@ impl Game {
         print_lines(options());
 
         loop {
+            if let Some(winner) = self.board.get_winner() {
+                println!("Congratulations! Player {:?} won!", winner);
+                println!();
+                self.board.draw();
+                println!();
+                break;
+            }
+
             println!("It is player {:?}'s' turn", self.player);
             println!();
 

@@ -58,7 +58,7 @@ impl Board {
         (0..3).map(move |row| (0..3).map(move |col| self.values[col][row]))
     }
 
-    fn get_winner(&self) -> Option<Player> {
+    pub fn get_winner(&self) -> Option<Player> {
         let diags = self.get_diags();
         if let Some(winner) = check_for_winner(diags.0) {
             return Some(winner);
