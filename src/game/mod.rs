@@ -28,22 +28,20 @@ impl Game {
     }
 
     pub fn play(&mut self) {
-        println!("Welcome to TicTacToe.");
-        println!();
+        print_lines(["Welcome to TicTacToe."]);
 
         print_lines(options());
 
         loop {
             match self.board.get_board_state() {
                 BoardState::WON(winner) => {
-                    println!();
-                    println!("Congratulations! Player {:?} won!", winner);
+                    print_lines([format!("Congratulations! Player {:?} won!", winner)]);
                     self.board.draw();
                     println!();
                     break;
                 }
                 BoardState::DRAW => {
-                    println!("Game Over. Nobody won!");
+                    print_lines(["Game Over. Nobody won!"]);
                     break;
                 }
                 BoardState::ONGOING => { /* just keep going */ }
@@ -51,18 +49,12 @@ impl Game {
 
             match (self.row, self.col) {
                 (None, None) => {
-                    println!();
-                    println!("It is player {:?}'s' turn", self.player);
-                    println!();
+                    print_lines([format!("It is player {:?}'s' turn", self.player)]);
                     self.board.draw();
-                    println!();
-                    println!("Please enter a row number");
-                    println!();
+                    print_lines(["Please enter a row number"]);
                 }
                 (Some(_), None) => {
-                    println!();
-                    println!("Please enter a column number");
-                    println!();
+                    print_lines(["Please enter a column number"]);
                 }
                 (Some(row), Some(col)) => match self.board.set_value(self.player, (row, col)) {
                     Ok(()) => {
@@ -71,8 +63,7 @@ impl Game {
                         continue;
                     }
                     Err(e) => {
-                        println!();
-                        println!("{}", e);
+                        print_lines([format!("{}", e)]);
                         self.reset_row_col();
                     }
                 },
@@ -95,23 +86,23 @@ impl Game {
                         continue;
                     }
                     Ok(_) => {
-                        println!(
+                        print_lines([format!(
                             "Please enter a valid number. The range is: 1 - {}",
                             self.board.get_height(),
-                        );
+                        )]);
                     }
                     Err(_) => {
-                        println!(
+                        print_lines([format!(
                             "Please enter a digit between 1 and {}",
                             self.board.get_height(),
-                        );
+                        )]);
                         continue;
                     }
                 },
             }
         }
 
-        println!("Thanks for playing. Come back soon!");
+        print_lines(["Thanks for playing. Come back soon!"]);
     }
 
     fn reset_row_col(&mut self) {
@@ -144,9 +135,11 @@ where
     I: IntoIterator,
     <I as IntoIterator>::Item: std::fmt::Display,
 {
+    println!();
     for line in lines {
         println!("{}", line);
     }
+    println!();
 }
 
 #[cfg(test)]
