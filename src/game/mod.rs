@@ -54,7 +54,10 @@ impl Game {
                         self.reset_row_col();
                         continue;
                     }
-                    Err(e) => println!("{}", e),
+                    Err(e) => {
+                        println!("{}", e);
+                        self.reset_row_col();
+                    }
                 },
                 (None, Some(_)) => unreachable!("Col can not be set before Row"),
             }
@@ -76,7 +79,7 @@ impl Game {
                     }
                     Err(e) => {
                         println!(
-                            "Please enter a valid row-number. The range is: 0 - {}, Err: {}",
+                            "Please enter a valid number. The range is: 0 - {}, Err: {}",
                             self.board.get_height(),
                             e
                         );
