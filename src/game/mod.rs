@@ -1,7 +1,7 @@
 mod board;
 pub mod player;
 
-use board::Board;
+use board::{Board, BoardState};
 use player::Player;
 use std::io::stdin;
 
@@ -34,12 +34,19 @@ impl Game {
         print_lines(options());
 
         loop {
-            if let Some(winner) = self.board.get_winner() {
-                println!();
-                println!("Congratulations! Player {:?} won!", winner);
-                self.board.draw();
-                println!();
-                break;
+            match self.board.get_board_state() {
+                BoardState::WON(winner) => {
+                    println!();
+                    println!("Congratulations! Player {:?} won!", winner);
+                    self.board.draw();
+                    println!();
+                    break;
+                }
+                BoardState::DRAW => {
+                    println!("Game Over. Nobody won!");
+                    break;
+                }
+                BoardState::ONGOING => { /* just keep going */ }
             }
 
             println!("It is player {:?}'s' turn", self.player);

@@ -2,6 +2,12 @@ use crate::game::player::Player;
 
 use std::ops::{Deref, DerefMut};
 
+pub enum BoardState {
+    ONGOING,
+    WON(Player),
+    DRAW,
+}
+
 type Values = [[Option<Player>; 3]; 3];
 
 #[derive(Debug, Default)]
@@ -60,7 +66,17 @@ impl Board {
         (0..3).map(move |row| (0..3).map(move |col| self.values[col][row]))
     }
 
-    pub fn get_winner(&self) -> Option<Player> {
+    pub fn get_board_state(&self) -> BoardState {
+        if let Some(player) = self.get_winner() {
+            return BoardState::WON(player);
+        }
+        if (*self).iter().flatten().any(|cell| cell.is_none()) {
+            return BoardState::ONGOING;
+        }
+        BoardState::DRAW
+    }
+
+    fn get_winner(&self) -> Option<Player> {
         let diags = self.get_diags();
         if let Some(winner) = check_for_winner(diags.0) {
             return Some(winner);
@@ -114,20 +130,20 @@ impl Board {
         let (x, y) = field;
         if x > height || y > width {
             Err("Field must be in range of the grid")
-        } else if self.values[x][y].is_some() {
+        } else if (*self)[x][y].is_some() {
             Err("Field has already been chosen. Please choose another field.")
         } else {
-            self.values[x][y] = Some(player);
+            (*self)[x][y] = Some(player);
             Ok(())
         }
     }
 
     pub fn get_height(&self) -> usize {
-        self.values.len()
+        (*self).len()
     }
 
     pub fn get_width(&self) -> usize {
-        self.values[0].len()
+        (*self)[0].len()
     }
 }
 
@@ -447,5 +463,51 @@ mod tests {
 
         let no_winner = board.get_winner();
         assert_eq!(None, no_winner);
+    }
+
+    #[test]
+    fn get_board_state_works() {
+        let mut board = Board::default();
+
+        // Unfinished board returns ONGOING
+        //  two | one | two
+        //  ----+-----+----
+        //  one | one | two
+        //  ----+-----+----
+        //  two |     |
+        let _ = board.set_value(Player::TWO, (0, 0));
+        let _ = board.set_value(Player::ONE, (0, 1));
+        let _ = board.set_value(Player::TWO, (0, 2));
+
+        let _ = board.set_value(Player::ONE, (1, 0));
+        let _ = board.set_value(Player::ONE, (1, 1));
+        let _ = board.set_value(Player::TWO, (1, 2));
+
+        let _ = board.set_value(Player::TWO, (2, 0));
+        let ongoing = board.get_board_state();
+        assert_eq!(BoardState::ONGOING, ongoing);
+
+        // Now Board is Finished But nobody won
+        //  two | one | two
+        //  ----+-----+----
+        //  one | one | two
+        //  ----+-----+----
+        //  two | two | one
+        let _ = board.set_value(Player::TWO, (2, 1));
+        let _ = board.set_value(Player::ONE, (2, 2));
+
+        let draw = board.get_board_state();
+        assert_eq!(BoardState::DRAW, draw);
+
+        // ONE wins
+        // (unallowed modification in actual game)
+        //  two | one | two
+        //  ----+-----+----
+        //  one | one | one <-- wins
+        //  ----+-----+----
+        //  two | two | one
+        (*board)[1][1] = Some(Player::ONE);
+        let winner_one = board.get_board_state();
+        assert_eq!(BoardState::WON(Player::ONE), winner_one);
     }
 }
