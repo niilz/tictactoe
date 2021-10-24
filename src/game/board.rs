@@ -50,7 +50,11 @@ impl Board {
         self.iter().map(|row| row.iter().map(|&item| item))
     }
 
-    // TODO: get_rows, get_cols, check_winner
+    fn get_cols(&self) -> impl Iterator<Item = impl Iterator<Item = Option<Player>> + '_> + '_ {
+        (0..3).map(move |row| (0..3).map(move |col| self.values[col][row]))
+    }
+
+    // TODO: get_cols, check_winner
 }
 
 fn gen_line(values: &[Option<Player>; 3]) -> String {
@@ -185,15 +189,60 @@ mod tests {
     #[test]
     fn can_get_rows() {
         let mut board = Board::default();
-        for i in 0..3 {
-            for j in 0..3 {
-                let _ = board.set_value(Player::ONE, (i, j));
-            }
-        }
-        let expected_rows: Vec<_> = (0..3)
-            .flat_map(|_| (0..3).map(|_| Some(Player::ONE)))
+        // row-0
+        let _ = board.set_value(Player::ONE, (0, 0));
+        let _ = board.set_value(Player::ONE, (0, 1));
+        let _ = board.set_value(Player::ONE, (0, 2));
+
+        // row-1
+        let _ = board.set_value(Player::TWO, (1, 0));
+        let _ = board.set_value(Player::TWO, (1, 1));
+        let _ = board.set_value(Player::TWO, (1, 2));
+
+        // row-2
+        let _ = board.set_value(Player::ONE, (2, 0));
+        let _ = board.set_value(Player::ONE, (2, 1));
+        let _ = board.set_value(Player::ONE, (2, 2));
+
+        let expected_rows = vec![
+            vec![Some(Player::ONE), Some(Player::ONE), Some(Player::ONE)],
+            vec![Some(Player::TWO), Some(Player::TWO), Some(Player::TWO)],
+            vec![Some(Player::ONE), Some(Player::ONE), Some(Player::ONE)],
+        ];
+        let rows: Vec<_> = board
+            .get_rows()
+            .map(|row| row.collect::<Vec<_>>())
             .collect();
-        let rows: Vec<_> = board.get_rows().flatten().collect();
         assert_eq!(expected_rows, rows);
+    }
+
+    #[test]
+    fn can_get_cols() {
+        let mut board = Board::default();
+        // col-0
+        let _ = board.set_value(Player::ONE, (0, 0));
+        let _ = board.set_value(Player::ONE, (1, 0));
+        let _ = board.set_value(Player::ONE, (2, 0));
+
+        // col-1
+        let _ = board.set_value(Player::TWO, (0, 1));
+        let _ = board.set_value(Player::TWO, (1, 1));
+        let _ = board.set_value(Player::TWO, (2, 1));
+
+        // col-2
+        let _ = board.set_value(Player::ONE, (0, 2));
+        let _ = board.set_value(Player::ONE, (1, 2));
+        let _ = board.set_value(Player::ONE, (2, 2));
+
+        let expected_cols = vec![
+            vec![Some(Player::ONE), Some(Player::ONE), Some(Player::ONE)],
+            vec![Some(Player::TWO), Some(Player::TWO), Some(Player::TWO)],
+            vec![Some(Player::ONE), Some(Player::ONE), Some(Player::ONE)],
+        ];
+        let cols: Vec<_> = board
+            .get_cols()
+            .map(|col| col.collect::<Vec<_>>())
+            .collect::<Vec<_>>();
+        assert_eq!(expected_cols, cols);
     }
 }
