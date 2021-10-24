@@ -1,6 +1,5 @@
 mod game;
 
-use game::player::Player;
 use game::Game;
 
 fn main() {

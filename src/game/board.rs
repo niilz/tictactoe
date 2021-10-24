@@ -2,6 +2,7 @@ use crate::game::player::Player;
 
 use std::ops::{Deref, DerefMut};
 
+#[derive(Debug, PartialEq)]
 pub enum BoardState {
     ONGOING,
     WON(Player),
@@ -506,7 +507,7 @@ mod tests {
         //  one | one | one <-- wins
         //  ----+-----+----
         //  two | two | one
-        (*board)[1][1] = Some(Player::ONE);
+        (*board)[1][2] = Some(Player::ONE);
         let winner_one = board.get_board_state();
         assert_eq!(BoardState::WON(Player::ONE), winner_one);
     }
