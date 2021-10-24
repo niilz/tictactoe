@@ -376,12 +376,58 @@ mod tests {
     }
 
     #[test]
-    fn get_winner_returns_none_if_draw() {
-        assert!(false)
-    }
-
-    #[test]
     fn get_winner_returns_winner_if_there_is_one() {
-        assert!(false)
+        let mut board = Board::default();
+
+        // One wins in col-0
+        let _ = board.set_value(Player::ONE, (0, 0));
+        let _ = board.set_value(Player::ONE, (1, 0));
+        let _ = board.set_value(Player::ONE, (2, 0));
+
+        let winner = board.get_winner();
+        assert_eq!(Some(Player::ONE), winner);
+
+        let mut board = Board::default();
+
+        // Two wins diag top_left-to-bottom_right
+        let _ = board.set_value(Player::TWO, (0, 0));
+        let _ = board.set_value(Player::TWO, (1, 1));
+        let _ = board.set_value(Player::TWO, (2, 2));
+
+        let winner = board.get_winner();
+        assert_eq!(Some(Player::TWO), winner);
+
+        // One wins with row-1
+        let mut board = Board::default();
+
+        let _ = board.set_value(Player::ONE, (1, 0));
+        let _ = board.set_value(Player::ONE, (1, 1));
+        let _ = board.set_value(Player::ONE, (1, 2));
+
+        let winner = board.get_winner();
+        assert_eq!(Some(Player::ONE), winner);
+
+        // No one wins if no line is filled by one player
+        let mut board = Board::default();
+
+        //  two | one | two
+        //  ----+-----+----
+        //  one | one | two
+        //  ----+-----+----
+        //  two | two | one
+        let _ = board.set_value(Player::TWO, (0, 0));
+        let _ = board.set_value(Player::ONE, (0, 1));
+        let _ = board.set_value(Player::TWO, (0, 2));
+
+        let _ = board.set_value(Player::ONE, (1, 0));
+        let _ = board.set_value(Player::ONE, (1, 1));
+        let _ = board.set_value(Player::TWO, (1, 2));
+
+        let _ = board.set_value(Player::TWO, (2, 0));
+        let _ = board.set_value(Player::TWO, (2, 1));
+        let _ = board.set_value(Player::ONE, (2, 2));
+
+        let no_winner = board.get_winner();
+        assert_eq!(None, no_winner);
     }
 }
