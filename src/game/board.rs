@@ -318,6 +318,35 @@ mod tests {
     }
 
     #[test]
+    fn winner_in_row_gets_detected() {
+        let mut board = Board::default();
+        // row-0
+        let _ = board.set_value(Player::ONE, (0, 0));
+        let _ = board.set_value(Player::ONE, (0, 1));
+        let _ = board.set_value(Player::ONE, (0, 2));
+
+        // row-1
+        let _ = board.set_value(Player::TWO, (1, 0));
+        let _ = board.set_value(Player::TWO, (1, 1));
+        let _ = board.set_value(Player::TWO, (1, 2));
+
+        // row-2
+        let _ = board.set_value(Player::ONE, (2, 0));
+        let _ = board.set_value(Player::ONE, (2, 2));
+
+        let mut rows = board.get_rows();
+
+        let winner = check_for_winner(rows.next().unwrap());
+        assert_eq!(Some(Player::ONE), winner);
+
+        let winner = check_for_winner(rows.next().unwrap());
+        assert_eq!(Some(Player::TWO), winner);
+
+        let no_winner = check_for_winner(rows.next().unwrap());
+        assert_eq!(None, no_winner);
+    }
+
+    #[test]
     fn winner_in_cols_gets_detected() {
         let mut board = Board::default();
         // col-0
@@ -344,11 +373,6 @@ mod tests {
 
         let no_winner = check_for_winner(columns.next().unwrap());
         assert_eq!(None, no_winner);
-    }
-
-    #[test]
-    fn winner_in_col_is_detected() {
-        assert!(false)
     }
 
     #[test]
